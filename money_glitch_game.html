@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Money Glitch — Learning Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:     #F5C842;
+  --gold-d:   #D4A520;
+  --coral:    #F07050;
+  --coral-d:  #D45030;
+  --sage:     #5A9E6E;
+  --sage-l:   #A8D4B4;
+  --sage-bg:  #EBF7EE;
+  --sky:      #5AACE0;
+  --sky-l:    #C0E0F7;
+  --lavender: #9B7FD4;
+  --lav-l:    #D4C4F7;
+  --cream:    #FFFBF0;
+  --warm:     #FFF5DC;
+  --dark:     #1A2717;
+  --text:     #2A2A2A;
+  --text-l:   #6B6B6B;
+  --white:    #FFFFFF;
+  --border:   #E8E0D0;
+  --correct:  #3DAB5C;
+  --wrong:    #E05050;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100vh; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* ══════════════════════
+   INTRO
+══════════════════════ */
+#intro-screen {
+  background: linear-gradient(160deg, #FFF5DC 0%, #FFF9E8 50%, #F0FFF4 100%);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-blob1 {
+  position: absolute; top:-80px; right:-80px;
+  width:320px; height:320px; border-radius:50%;
+  background: radial-gradient(circle, rgba(245,200,66,0.25), transparent 70%);
+}
+.intro-blob2 {
+  position: absolute; bottom:-60px; left:-60px;
+  width:280px; height:280px; border-radius:50%;
+  background: radial-gradient(circle, rgba(90,158,110,0.2), transparent 70%);
+}
+.intro-blob3 {
+  position: absolute; top:40%; right:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background: radial-gradient(circle, rgba(240,112,80,0.15), transparent 70%);
+}
+
+.intro-inner { position:relative; z-index:2; max-width:560px; }
+
+.intro-eagle {
+  font-size: 80px;
+  margin-bottom: 16px;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 8px 16px rgba(245,200,66,0.4));
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.intro-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.intro-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(44px, 10vw, 72px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 0.95;
+  margin-bottom: 8px;
+}
+
+.intro-title .glitch-word {
+  color: var(--gold-d);
+  display: block;
+  -webkit-text-stroke: 2px var(--dark);
+}
+
+.intro-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--coral);
+  margin-bottom: 20px;
+}
+
+.intro-desc {
+  font-size: 16px;
+  color: var(--text-l);
+  line-height: 1.75;
+  margin-bottom: 32px;
+}
+.intro-desc strong { color: var(--dark); }
+
+.dots-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--white);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 10px; font-weight: 800;
+  color: var(--border);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s;
+}
+.dot.done { background: var(--gold); border-color: var(--gold-d); color: var(--dark); }
+.dot.next { background: var(--white); border-color: var(--coral); color: var(--coral); }
+
+.btn-start {
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  padding: 18px 52px;
+  border: 3px solid var(--dark);
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--dark);
+  transition: all 0.15s;
+  display: inline-block;
+}
+.btn-start:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--dark); }
+.btn-start:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--dark); }
+
+.btn-reset {
+  background: transparent;
+  color: var(--text-l);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 12px;
+  display: block;
+  margin: 12px auto 0;
+}
+.btn-reset:hover { color: var(--text); border-color: var(--text-l); }
+
+/* ══════════════════════
+   MAP
+══════════════════════ */
+#map-screen { background: var(--cream); }
+
+.map-header {
+  background: var(--dark);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: sticky; top:0; z-index:50;
+  border-bottom: 3px solid var(--gold);
+}
+
+.map-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--white);
+}
+.map-logo span { color: var(--gold); }
+
+.map-progress-wrap { display:flex; align-items:center; gap:10px; }
+.map-progress-label { font-size:12px; font-weight:700; color:rgba(255,255,255,0.5); }
+.map-progress-bar {
+  width: 160px; height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  overflow: visible;
+  position: relative;
+}
+.map-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--gold), var(--coral));
+  border-radius: 5px;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+.map-eagle-marker {
+  position: absolute;
+  top: -8px;
+  font-size: 22px;
+  transition: left 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.map-progress-count { font-size:13px; font-weight:800; color:var(--gold); }
+
+/* Part sections */
+.map-part {
+  padding: 28px 24px 0;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.part-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.part-1 { background: rgba(245,200,66,0.2); color: #8A6800; }
+.part-2 { background: rgba(90,158,110,0.15); color: #2D6B45; }
+.part-3 { background: rgba(90,172,224,0.15); color: #1A6B9E; }
+.part-4 { background: rgba(155,127,212,0.15); color: #5C3DAB; }
+.part-5 { background: rgba(240,112,80,0.15); color: #8B2E10; }
+
+.part-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+/* Level cards */
+.level-card {
+  border-radius: 16px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+  border: 3px solid transparent;
+  user-select: none;
+}
+
+.level-card.locked {
+  background: #F5F0E8;
+  border-color: var(--border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.level-card.available {
+  background: var(--white);
+  border-color: var(--dark);
+  box-shadow: 4px 4px 0 var(--dark);
+  cursor: pointer;
+}
+.level-card.available:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0 var(--dark);
+}
+.level-card.available:active {
+  transform: translate(2px,2px);
+  box-shadow: 2px 2px 0 var(--dark);
+}
+
+/* Part-colored available cards */
+.level-card.available.p1 { background: #FFFBE8; border-color: var(--gold-d); box-shadow: 4px 4px 0 var(--gold-d); }
+.level-card.available.p1:hover { box-shadow: 6px 6px 0 var(--gold-d); }
+.level-card.available.p2 { background: var(--sage-bg); border-color: #2D6B45; box-shadow: 4px 4px 0 #2D6B45; }
+.level-card.available.p2:hover { box-shadow: 6px 6px 0 #2D6B45; }
+.level-card.available.p3 { background: #EBF5FF; border-color: #1A6B9E; box-shadow: 4px 4px 0 #1A6B9E; }
+.level-card.available.p3:hover { box-shadow: 6px 6px 0 #1A6B9E; }
+.level-card.available.p4 { background: #F5F0FF; border-color: #5C3DAB; box-shadow: 4px 4px 0 #5C3DAB; }
+.level-card.available.p4:hover { box-shadow: 6px 6px 0 #5C3DAB; }
+.level-card.available.p5 { background: #FFF0EB; border-color: var(--coral-d); box-shadow: 4px 4px 0 var(--coral-d); }
+.level-card.available.p5:hover { box-shadow: 6px 6px 0 var(--coral-d); }
+
+.level-card.done {
+  background: var(--gold);
+  border-color: var(--dark);
+  box-shadow: 4px 4px 0 var(--dark);
+  cursor: pointer;
+}
+.level-card.done:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0 var(--dark);
+}
+
+.level-card.next-up {
+  animation: next-pulse 2s ease-in-out infinite;
+}
+@keyframes next-pulse {
+  0%,100% { box-shadow: 4px 4px 0 var(--dark); }
+  50% { box-shadow: 4px 4px 0 var(--dark), 0 0 0 6px rgba(245,200,66,0.3); }
+}
+
+.card-num {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-l);
+  margin-bottom: 8px;
+}
+.level-card.done .card-num { color: var(--dark); opacity:0.6; }
+
+.card-icon { font-size: 32px; margin-bottom: 8px; }
+.level-card.locked .card-icon { filter: grayscale(1) opacity(0.4); }
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.level-card.locked .card-name { color: var(--text-l); }
+.level-card.done .card-name { color: var(--dark); }
+
+.card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.badge-locked { background: rgba(0,0,0,0.06); color: var(--text-l); }
+.badge-available { background: var(--dark); color: var(--white); }
+.badge-done { background: var(--dark); color: var(--gold); }
+
+.map-footer { height: 40px; }
+
+/* ══════════════════════
+   LESSON
+══════════════════════ */
+#lesson-screen { background: var(--cream); }
+
+.lesson-header {
+  background: var(--dark);
+  border-bottom: 3px solid var(--gold);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky; top:0; z-index:50;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: rgba(255,255,255,0.2); color:white; }
+
+.lesson-hd-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--white);
+}
+.lesson-hd-part {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.lesson-body {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* Infographic */
+.info-card {
+  background: var(--white);
+  border: 3px solid var(--dark);
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 5px 5px 0 var(--dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: '';
+  position: absolute;
+  top:0; left:0; right:0; height:5px;
+  background: linear-gradient(to right, var(--gold), var(--coral), var(--sage));
+}
+
+.info-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 10px;
+}
+
+.info-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.info-sub {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-l);
+  margin-bottom: 24px;
+}
+
+.visual-area {
+  background: var(--cream);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.v-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.v-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  background: var(--warm);
+  border-radius: 10px;
+  display: flex; align-items:center; justify-content:center;
+}
+
+.v-text { flex:1; }
+.v-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-d);
+  margin-bottom: 3px;
+}
+.v-desc {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.v-arrow {
+  text-align: center;
+  font-size: 22px;
+  color: var(--gold-d);
+  margin: -4px 0;
+}
+
+.key-box {
+  background: linear-gradient(135deg, #FFFBE8, #FFF5DC);
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.key-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-d);
+  margin-bottom: 6px;
+}
+.key-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--dark);
+  line-height: 1.55;
+}
+
+/* Quiz */
+.quiz-card {
+  background: var(--white);
+  border: 3px solid var(--dark);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 5px 5px 0 var(--dark);
+  margin-bottom: 20px;
+}
+
+.quiz-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.quiz-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--sage);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.quiz-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-l);
+}
+
+.quiz-q {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.options { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+
+.opt-btn {
+  background: var(--cream);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  transition: all 0.15s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.opt-btn:hover:not(.disabled) {
+  border-color: var(--gold-d);
+  background: var(--warm);
+  transform: translateX(4px);
+}
+.opt-btn.correct {
+  background: #EAFBEE;
+  border-color: var(--correct);
+  color: var(--dark);
+}
+.opt-btn.wrong {
+  background: #FBF0EE;
+  border-color: var(--wrong);
+  color: #8B2020;
+}
+.opt-btn.disabled { cursor:not-allowed; }
+
+.opt-letter {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--white);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 12px; font-weight: 800;
+  color: var(--text-l);
+  flex-shrink:0;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.opt-btn.correct .opt-letter { background: var(--correct); border-color: var(--correct); color:white; }
+.opt-btn.wrong .opt-letter { background: var(--wrong); border-color: var(--wrong); color:white; }
+
+.feedback-box {
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  display: none;
+}
+.feedback-box.show { display:block; animation: slide-in 0.3s ease; }
+@keyframes slide-in { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.feedback-box.correct { background:#EAFBEE; border:2px solid var(--correct); color:#1A5C2A; }
+.feedback-box.wrong { background:#FBF0EE; border:2px solid var(--wrong); color:#6B1A1A; }
+
+.next-btn {
+  background: var(--dark);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 14px 32px;
+  border: 3px solid var(--dark);
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--gold-d);
+  transition: all 0.15s;
+  display: none;
+}
+.next-btn:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--gold-d); }
+.next-btn.show { display:inline-block; animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+
+@keyframes pop-in {
+  from { transform:scale(0.7); opacity:0; }
+  to { transform:scale(1); opacity:1; }
+}
+
+/* Win card */
+.win-card {
+  background: linear-gradient(135deg, var(--gold), var(--coral));
+  border: 3px solid var(--dark);
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 5px 5px 0 var(--dark);
+  display: none;
+  margin-bottom: 20px;
+}
+.win-card.show { display:block; animation: pop-in 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+.win-eagle { font-size: 56px; margin-bottom: 10px; animation: float 2s ease-in-out infinite; }
+.win-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+.win-sub { font-size: 15px; color: rgba(26,39,23,0.75); line-height:1.6; margin-bottom:24px; }
+
+.win-next-btn {
+  background: var(--dark);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 14px 32px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+  transition: all 0.15s;
+}
+.win-next-btn:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(0,0,0,0.3); }
+
+.win-map-btn {
+  background: transparent;
+  color: rgba(26,39,23,0.7);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: 2px solid rgba(26,39,23,0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+.win-map-btn:hover { background:rgba(26,39,23,0.1); }
+
+/* ══════════════════════
+   COMPLETION SCREEN
+══════════════════════ */
+#complete-screen {
+  background: linear-gradient(160deg, #FFF5DC, #FFF9E8, #F0FFF4);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  overflow: hidden;
+}
+#complete-screen .intro-blob1,
+#complete-screen .intro-blob2,
+#complete-screen .intro-blob3 { display:block; }
+
+.complete-inner { position:relative; z-index:2; max-width:560px; }
+
+.complete-eagle-big { font-size:90px; animation:float 3s ease-in-out infinite; margin-bottom:16px; filter:drop-shadow(0 8px 20px rgba(245,200,66,0.5)); }
+
+.trophy-badge {
+  width:120px; height:120px;
+  background: linear-gradient(135deg, var(--gold), var(--coral));
+  border: 4px solid var(--dark);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column;
+  margin: 0 auto 24px;
+  box-shadow: 5px 5px 0 var(--dark);
+}
+.trophy-num { font-family:'Playfair Display',serif; font-size:40px; font-weight:900; color:var(--dark); line-height:1; }
+.trophy-label { font-size:10px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--dark); opacity:0.6; }
+
+.complete-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,8vw,54px);
+  font-weight:900;
+  color:var(--dark);
+  line-height:1.1;
+  margin-bottom:14px;
+}
+.complete-title span { color:var(--gold-d); display:block; }
+
+.complete-sub {
+  font-size:17px;
+  color:var(--text-l);
+  line-height:1.75;
+  margin-bottom:36px;
+}
+
+/* ══════════════════════
+   UNLOCK OVERLAY
+══════════════════════ */
+#unlock-overlay {
+  position:fixed; inset:0;
+  background:rgba(255,251,240,0.96);
+  display:none;
+  align-items:center; justify-content:center;
+  text-align:center;
+  z-index:200;
+  flex-direction:column;
+  gap:14px;
+}
+#unlock-overlay.show { display:flex; animation:fade-in 0.25s ease; }
+@keyframes fade-in { from{opacity:0} to{opacity:1} }
+
+.unlock-eagle { font-size:80px; animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounce-in { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0)} }
+
+.unlock-title {
+  font-family:'Playfair Display',serif;
+  font-size:36px;
+  font-weight:900;
+  color:var(--dark);
+  background:linear-gradient(135deg,var(--gold-d),var(--coral));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.unlock-sub { font-size:18px; color:var(--text-l); }
+
+.confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:201; overflow:hidden; }
+.cpce {
+  position:absolute;
+  border-radius:3px;
+  animation:fall linear forwards;
+}
+@keyframes fall {
+  0% { transform:translateY(-30px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ══════════════════════
+   RESPONSIVE
+══════════════════════ */
+@media(max-width:600px) {
+  .part-grid { grid-template-columns:repeat(2,1fr); }
+  .lesson-body { padding:20px 14px 50px; }
+  .info-card,.quiz-card,.win-card { padding:20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- UNLOCK OVERLAY -->
+<div id="unlock-overlay">
+  <div class="confetti-wrap" id="confetti"></div>
+  <div class="unlock-eagle">🦅</div>
+  <div class="unlock-title">Level Unlocked!</div>
+  <div class="unlock-sub" id="unlock-sub-text"></div>
+</div>
+
+<!-- ══════════════════════
+     INTRO
+══════════════════════ -->
+<div id="intro-screen" class="screen active">
+  <div class="intro-blob1"></div>
+  <div class="intro-blob2"></div>
+  <div class="intro-blob3"></div>
+  <div class="intro-inner">
+    <div class="intro-eagle">🦅</div>
+    <div class="intro-badge">Interactive Learning Game · 16 Levels</div>
+    <h1 class="intro-title">The Money<span class="glitch-word">Glitch</span></h1>
+    <div class="intro-subtitle">Hidden in Plain Sight</div>
+    <p class="intro-desc">
+      Complete each level to unlock the next.<br>
+      <strong>Visual lessons + quick quizzes.</strong> Pass the quiz, unlock the next chapter.<br>
+      Learn the system that changes how you see opportunity.
+    </p>
+    <div class="dots-row" id="intro-dots"></div>
+    <button class="btn-start" onclick="showMap()">Start Playing 🦅</button>
+    <button class="btn-reset" onclick="resetAll()">Reset Progress</button>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MAP
+══════════════════════ -->
+<div id="map-screen" class="screen">
+  <div class="map-header">
+    <div class="map-logo">The Money <span>Glitch</span></div>
+    <div class="map-progress-wrap">
+      <div class="map-progress-label">Progress</div>
+      <div class="map-progress-bar">
+        <div class="map-progress-fill" id="prog-fill"></div>
+        <div class="map-eagle-marker" id="prog-eagle">🦅</div>
+      </div>
+      <div class="map-progress-count" id="prog-count">0/16</div>
+    </div>
+  </div>
+  <div id="map-body" style="padding-bottom:40px;"></div>
+</div>
+
+<!-- ══════════════════════
+     LESSON
+══════════════════════ -->
+<div id="lesson-screen" class="screen">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="showMap()">← Map</button>
+    <div class="lesson-hd-title" id="lhd-title"></div>
+    <div class="lesson-hd-part" id="lhd-part"></div>
+  </div>
+  <div class="lesson-body" id="lesson-body"></div>
+</div>
+
+<!-- ══════════════════════
+     COMPLETE
+══════════════════════ -->
+<div id="complete-screen" class="screen">
+  <div class="intro-blob1"></div>
+  <div class="intro-blob2"></div>
+  <div class="complete-inner">
+    <div class="complete-eagle-big">🦅</div>
+    <div class="trophy-badge">
+      <div class="trophy-num">16</div>
+      <div class="trophy-label">Levels</div>
+    </div>
+    <h2 class="complete-title">You Did It!<span>The Money Glitch.</span></h2>
+    <p class="complete-sub">All 16 levels complete. You now have the full system — attention, psychology, hooks, analytics, systems, and the long game. Go build something real.</p>
+    <button class="btn-start" onclick="showMap()">Review Any Level →</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────
+const PARTS = [
+  { label:'Part I: Learning the Game', cls:'part-1', levels:[1,2,3,4] },
+  { label:'Part II: Understanding People', cls:'part-2', levels:[5,6,7,8] },
+  { label:'Part III: Creating Content', cls:'part-3', levels:[9,10,11] },
+  { label:'Part IV: Build the Business', cls:'part-4', levels:[12,13,14] },
+  { label:'Part V: Play the Long Game', cls:'part-5', levels:[15,16] },
+];
+
+const LEVELS = [
+  { num:1, name:"Welcome to the Gold Rush", icon:"🏆", part:"Part I: Learning the Game",
+    info:{ eyebrow:"Chapter 1 · The Foundation", title:"You're Not Building an Affiliate Business.", sub:"You're building an attention business.", visual:[
+      {icon:"👁️",label:"Step 1 — Attention",desc:"Someone stops scrolling. This happens BEFORE any click, sale, or commission."},
+      "▼",
+      {icon:"🖱️",label:"Step 2 — Curiosity",desc:"They want to know more. The product earns their next few seconds."},
+      "▼",
+      {icon:"💰",label:"Step 3 — Commission",desc:"Trust builds. They click. They buy. You earn."},
+    ], key:"Every dollar begins the same way — someone deciding you were worth a few more seconds of their time."},
+    qs:[
+      {q:"What kind of business are you ACTUALLY building on TikTok Shop?",opts:["An affiliate business","An attention business","A follower business","A product business"],correct:1,fb:"Affiliate marketing is how you get paid — not the business you're building. You're building the ability to earn attention first."},
+      {q:"What has to happen BEFORE any click, sale, or commission?",opts:["You need 10,000 followers","Someone stops scrolling","You go viral","You find the perfect product"],correct:1,fb:"Someone stopping their scroll is the doorway every single sale has to walk through. No attention = no sale, no matter how good the product."},
+      {q:"TikTok asks 'Do we like this creator?' True or false?",opts:["True","False — it asks 'Do people like THIS video?'","True, followers matter most","False — it only cares about posting frequency"],correct:1,fb:"TikTok doesn't judge the creator — it judges each individual video. That means your next post is never limited by your last one. Every video gets a fresh shot."}
+    ]
+  },
+  { num:2, name:"The TikTok Shop Ecosystem", icon:"🌿", part:"Part I: Learning the Game",
+    info:{ eyebrow:"Chapter 2 · Three Players", title:"Every Great Sale Creates Three Winners.", sub:"Miss one and the whole thing breaks.", visual:[
+      {icon:"🛒",label:"The Customer",desc:"Buying progress — a better version of their day. Not the product itself."},
+      {icon:"📦",label:"The Seller",desc:"Wants honest representation. Accurate content builds long-term partnerships."},
+      {icon:"📱",label:"TikTok",desc:"Wants people to stay on the app. Your video earns reach when it does that job."},
+    ], key:"The strongest content creates a win for the customer, the seller, and the platform — all in the same sixty seconds."},
+    qs:[
+      {q:"What does TikTok ultimately want from your video?",opts:["For you to make sales","For people to stay on the app longer","For products to get good reviews","For you to grow your following"],correct:1,fb:"TikTok's entire algorithm is built around one goal — keeping people on the platform. When your video does that, TikTok has every reason to show it to more people."},
+      {q:"What does the customer actually buy?",opts:["The product itself","A good deal","Progress — a better version of their day","Your recommendation"],correct:2,fb:"People almost never buy the product. They buy what they believe the product will do for them — the outcome, the feeling, the progress toward a better life."},
+      {q:"What do sellers want most from a TikTok Shop creator?",opts:["The most views possible","A viral moment","Honest, accurate representation of their product","Celebrity endorsement"],correct:2,fb:"Sellers want accurate attention — customers who genuinely need what they're selling and who'll be happy when it arrives. Overselling creates returns and kills long-term trust."}
+    ]
+  },
+  { num:3, name:"Finding Your Niche", icon:"🎯", part:"Part I: Learning the Game",
+    info:{ eyebrow:"Chapter 3 · Your Audience", title:"A Niche Isn't a Category.", sub:"It's a conversation.", visual:[
+      {icon:"❌",label:"Wrong Approach",desc:'"I make Home & Lifestyle content." — Describes what you post.'},
+      "▼",
+      {icon:"✅",label:"Right Approach",desc:'"I help busy moms make their homes feel more manageable." — Describes who you help.'},
+      {icon:"🔑",label:"The Secret",desc:"People follow people who understand them — not people who review products."},
+    ], key:"Don't choose products you want to promote. Choose people you want to understand. The products will follow."},
+    qs:[
+      {q:"What should you choose BEFORE choosing products?",opts:["Your niche category","Your filming equipment","The person you want to serve","Your posting schedule"],correct:2,fb:"Once you understand the person — their problems, their life, their frustrations — the right products become obvious. The person always comes first."},
+      {q:"Why is lived experience such a content advantage?",opts:["It's easier to film","It can't be faked — audiences trust it instantly","It gets more followers","It requires less editing"],correct:1,fb:"No course can teach lived experience. And lived experience creates trust faster than almost anything else on camera. Your real life is your content advantage."},
+      {q:"What's the best question to find your natural niche?",opts:["What products have the highest commission?","What conversations could I have without doing any research?","What's trending right now?","What do other creators post?"],correct:1,fb:"The topics you can speak about naturally — without Googling — are where your advice sounds real instead of researched. That authenticity is what builds lasting audience trust."}
+    ]
+  },
+  { num:4, name:"Product Selection Masterclass", icon:"📦", part:"Part I: Learning the Game",
+    info:{ eyebrow:"Chapter 4 · Products", title:"Free Products Aren't Free.", sub:"Every sample costs your most valuable resource — time.", visual:[
+      {icon:"⏱️",label:"The Real Cost",desc:"Film me. Edit me. Think about me. Store me. Every sample competes for hours of your life."},
+      {icon:"🎯",label:"The Filter Question",desc:'"Would I invest three hours of my life into this?" Not "Can I get this sample?"'},
+      {icon:"📊",label:"Score It",desc:"Problem? Visual demo? Curiosity? Audience fit? Content potential? Rate each 1–10 first."},
+    ], key:"The best affiliates don't collect products. They invest their time where attention, trust, and demand are already pointing."},
+    qs:[
+      {q:"What is the REAL cost of every free sample?",opts:["Nothing — it's free","Your time and creative energy","Shipping fees","Your credibility"],correct:1,fb:"Free products are never really free. They cost your most valuable resource — time. Every sample you accept is quietly asking for hours of your life."},
+      {q:"What should you do with declined samples sitting in your house?",opts:["Film them anyway","Let them pile up","Donate, gift, or toss — create a 'Maybe Later' bin with a deadline","Keep them for later inspiration"],correct:2,fb:"A 'no' needs an actual next step or it quietly becomes 'later' which becomes clutter that makes you feel behind every time you walk past it."},
+      {q:"A product has 20% commission but nobody wants it. What does that mean?",opts:["It's still worth filming","It's a strong opportunity","It's still a bad investment of your time","It will sell itself"],correct:2,fb:"Commission percentage means nothing without demand, curiosity, and audience fit. A 20% commission on something nobody wants is still a waste of your time."}
+    ]
+  },
+  { num:5, name:"Buyer Psychology", icon:"🧠", part:"Part II: Understanding People",
+    info:{ eyebrow:"Chapter 5 · Why People Buy", title:"People Don't Buy Products.", sub:"They buy progress toward the life they're hoping to create.", visual:[
+      {icon:"😤",label:"Current Reality",desc:"Frustrated. Overwhelmed. Problem unsolved. This is where your viewer lives right now."},
+      "▼",
+      {icon:"🛒",label:"The Product",desc:"Not the destination — the bridge. It promises to close the gap."},
+      "▼",
+      {icon:"✨",label:"Future Reality",desc:"Cleaner. Easier. Calmer. More confident. This is what they're actually buying."},
+    ], key:"Show the destination, not the product. Sell the feeling on the other side of the purchase — not the object that gets them there."},
+    qs:[
+      {q:"When someone buys a cordless vacuum, what are they actually buying?",opts:["Suction power","A motor and filter","Ten extra minutes and a cleaner home","A brand name"],correct:2,fb:"They're not buying suction — they're buying time, ease, and the feeling of a clean floor without the hassle. The vacuum is the bridge. The feeling is the destination."},
+      {q:"What is the 'progress gap' in TikTok Shop content?",opts:["The gap between your follower count and big creators","The emotional distance between current frustration and future relief","The time between posting and going viral","The gap in your posting schedule"],correct:1,fb:"The bigger the emotional gap between where someone is and where the product takes them, the more compelling the content becomes. Your video bridges that gap."},
+      {q:"Which buying trigger does 'I owe this product an apology' target?",opts:["Save money","Curiosity — I have to know if this works","Belong — everyone talks about it","Escape pain"],correct:1,fb:"That hook creates pure curiosity — it signals a surprising result the viewer has to see for themselves. Curiosity is one of the most powerful buying triggers on the platform."}
+    ]
+  },
+  { num:6, name:"Content That Converts", icon:"💬", part:"Part II: Understanding People",
+    info:{ eyebrow:"Chapter 6 · Content Strategy", title:"Stop Making Commercials.", sub:"Start having conversations.", visual:[
+      {icon:"📺",label:"Commercial Energy",desc:'"Hi guys! Today I\'m reviewing this amazing product!" Nobody talks like this in real life.'},
+      "▼",
+      {icon:"☕",label:"Conversation Energy",desc:'"You\'re not going to believe what happened with this thing." Real. Relatable. Trustworthy.'},
+      {icon:"🍽️",label:"The Dinner Table Test",desc:"Would you tell this story to a friend at dinner? If yes, post it. If no, rewrite it."},
+    ], key:"People don't share commercials with friends. They share conversations worth repeating. Make videos people would naturally retell."},
+    qs:[
+      {q:"What is the 'Dinner Table Test' for TikTok content?",opts:["Would I eat while filming this?","Would I naturally tell this story to someone I care about?","Would this work as a dinner party ad?","Is this filmed in a kitchen?"],correct:1,fb:"If you'd naturally tell the story to a friend at dinner — it's content. If it sounds like an ad, viewers can feel it and they scroll away. The test is that simple."},
+      {q:"What does 'helping' create vs. 'convincing'?",opts:["More views vs. more sales","Trust vs. resistance","Faster results vs. slower results","More followers vs. more engagement"],correct:1,fb:"People sense immediately whether someone is trying to help or convince them. Helping creates trust. Convincing creates resistance. The less your content tries to sell, the more people buy."},
+      {q:"What are the 4 parts of a great content conversation?",opts:["Hook, product, demo, CTA","Intro, middle, end, subscribe","Something grabs you → problem appears → something changes → takeaway","Open, body, close, share"],correct:2,fb:"Something grabs attention → a problem appears → something changes → there's a takeaway. This structure is thousands of years old. TikTok didn't invent it — it just rewards it."}
+    ]
+  },
+  { num:7, name:"The Hook Bible", icon:"🎣", part:"Part II: Understanding People",
+    info:{ eyebrow:"Chapter 7 · Hook Writing", title:"Your Hook Has One Job.", sub:"Not to sell. Not to explain. Just earn the next three seconds.", visual:[
+      {icon:"🧠",label:"The Curiosity Gap",desc:"Our brains hate unfinished information. A great hook opens a loop the brain desperately wants closed."},
+      {icon:"🎬",label:"The Movie Trailer Rule",desc:"Don't tell everything. Show just enough to make them need the rest. Leave one question unanswered."},
+      {icon:"💬",label:"The Honest Hook",desc:'"I genuinely didn\'t think this would work." Real thoughts create real curiosity. Authenticity beats cleverness every time.'},
+    ], key:"People don't keep watching because you showed them a product. They keep watching because you gave them a reason to wonder what happens next."},
+    qs:[
+      {q:"What is the ONE job of a hook?",opts:["Sell the product","Explain what the video is about","Earn the next three seconds of attention","Get people to follow you"],correct:2,fb:"Not sell. Not explain. Just earn three more seconds. Then three more. Until they're invested enough to watch the whole thing. One second at a time."},
+      {q:"Why do honest hooks like 'I was wrong about this' outperform clever hooks?",opts:["They're shorter","They create genuine curiosity because they feel real","They're easier to write","They have more keywords"],correct:1,fb:"Real thoughts create real curiosity. Authentic vulnerability is disarming — the viewer's guard goes down and their curiosity goes up. Clever is forgettable. Honest is clickable."},
+      {q:"What makes 'I owe this product an apology' so effective?",opts:["It's funny","It implies a surprising result the viewer has to see for themselves","It mentions the product early","It's short"],correct:1,fb:"An apology implies you were wrong about something — which means the product did something unexpected. That gap between expectation and reality is pure curiosity bait."}
+    ]
+  },
+  { num:8, name:"TikTok Shop SEO Playbook", icon:"🔍", part:"Part II: Understanding People",
+    info:{ eyebrow:"Chapter 8 · SEO & Discovery", title:"Teach TikTok Who Should Care.", sub:"SEO isn't about computers. It's about communication.", visual:[
+      {icon:"🗣️",label:"What You Say",desc:"Speak naturally about the problem you're solving. TikTok listens and learns."},
+      {icon:"✍️",label:"What You Write",desc:"Captions and text overlays — simple, clear language beats clever every time."},
+      {icon:"👥",label:"Viewer Behavior",desc:"Who watches, clicks, and buys teaches TikTok exactly who your content is for."},
+    ], key:"SEO isn't tricking the algorithm. It's clearly teaching TikTok who should care about your content so it can find them for you."},
+    qs:[
+      {q:"What does TikTok's algorithm do after you post?",opts:["Judges your editing skills","Shows it to all your followers","Tests it with a small group to see who responds, then decides who else to show it to","Compares it to trending content"],correct:2,fb:"TikTok is like the world's fastest librarian — it figures out what your content is about from clues, then finds the right audience. The clearer your clues, the better the match."},
+      {q:"What do real people actually search for on TikTok?",opts:["Product names and brand names","Problems and outcomes — 'best stain remover', 'things that organize your pantry'","Creator names","Hashtags only"],correct:1,fb:"People search for problems, not products. Speak your audience's language — the words they actually type when they have the problem your product solves."},
+      {q:"What is more effective for TikTok SEO?",opts:["Mysterious captions","Captions packed with every buzzword","Clear language describing the problem, audience, or outcome","Long captions with every hashtag"],correct:2,fb:"Clarity beats clever every time. A caption that clearly states the problem, who it's for, or what the outcome is does more SEO work than any creative writing will."}
+    ]
+  },
+  { num:9, name:"Filming Like a Creator", icon:"🎬", part:"Part III: Creating Content",
+    info:{ eyebrow:"Chapter 9 · Filming", title:"Don't Film Videos.", sub:"Collect evidence.", visual:[
+      {icon:"🔴",label:"Proof Shot 1 — Problem",desc:"Show the frustration BEFORE the product. The mess, the stain, the clutter. Your before."},
+      "▼",
+      {icon:"⚡",label:"Proof Shot 2 — Process",desc:"Show the product actually being USED. Not posed. Moving, working, demonstrating."},
+      "▼",
+      {icon:"✨",label:"Proof Shot 3 — Result",desc:"The transformation. What changed? The payoff. Don't ever skip this shot."},
+    ], key:"Stop thinking in videos. Start thinking in assets. Every product gets a folder. Every folder becomes a library your future self will thank you for."},
+    qs:[
+      {q:"What mindset shift makes filming feel easier?",opts:["'I need to make a viral video'","'I need to make a perfect video'","'I'm just going to collect footage today'","'I need to post something'"],correct:2,fb:"Collecting footage feels like gathering ingredients. Making a finished video feels like cooking a full meal under pressure. The shift from 'make' to 'collect' removes anxiety and improves output."},
+      {q:"What are the three essential 'proof shots'?",opts:["Unboxing, review, opinion","Problem, process, result","Hook, demo, CTA","Before, during, price"],correct:1,fb:"The problem (before), the process (product in action), and the result (transformation). Skip any one and you lose part of the belief-building sequence buyers need to trust you."},
+      {q:"Why film MORE footage than you think you need?",opts:["To fill a longer video","So you have assets to build multiple videos and angles from one session","TikTok rewards longer videos","To show off your filming skills"],correct:1,fb:"One afternoon of filming can create five hooks, ten B-roll clips, three comparisons, a before-and-after, and multiple follow-up videos. One product. Weeks of content. That's real leverage."}
+    ]
+  },
+  { num:10, name:"Editing for Retention", icon:"✂️", part:"Part III: Creating Content",
+    info:{ eyebrow:"Chapter 10 · Editing", title:"Editing Is Removing Reasons to Leave.", sub:"Not adding reasons to stay.", visual:[
+      {icon:"⏳",label:"Every Second = A Choice",desc:"Stay or leave. Editing removes the moments that let people leave — it doesn't convince them to stay."},
+      {icon:"🏃",label:"Rule of Forward Motion",desc:"After every clip, ask 'Now what?' If the answer isn't obvious, something needs to change."},
+      {icon:"✂️",label:"Cut What You Love",desc:"Just because you filmed it doesn't mean it belongs. Edit for the stranger who's never seen this video."},
+    ], key:"Editing isn't about adding more. It's about removing every reason someone might stop watching before your story is finished."},
+    qs:[
+      {q:"What is the main job of editing?",opts:["Making the video look professional","Adding music and effects","Removing every reason someone might leave before the story ends","Making the video longer"],correct:2,fb:"Every edit serves one purpose — keeping the viewer in the story. If a clip doesn't pull people forward, it's an exit door. Your job as an editor is closing as many exit doors as possible."},
+      {q:"What does 'editing for momentum' mean?",opts:["Adding fast transitions","Making the story always feel like it's moving forward","Posting faster","Using trending sounds"],correct:1,fb:"Great videos feel like they're always moving — not because the camera moves, but because the story does. Problem gets worse, solution appears, proof gets stronger, payoff gets closer."},
+      {q:"What is the 'Finish Line Test' before posting?",opts:["Watch it at 2x speed","Show it to a friend","Watch it as a stranger — note where your attention dips — trim those moments","Check your view count on previous posts"],correct:2,fb:"Watch your own video as a complete stranger would. Where did you get impatient? Where did you already know what was coming? Those are exactly where viewers will leave. Trim them."}
+    ]
+  },
+  { num:11, name:"Reading the Data", icon:"📊", part:"Part III: Creating Content",
+    info:{ eyebrow:"Chapter 11 · Analytics + Money Printers", title:"Analytics Aren't Grades.", sub:"They're clues. Read them like a detective.", visual:[
+      {icon:"👁️",label:"Views — Did people stop?",desc:"If not: the hook needs work."},
+      {icon:"⏱️",label:"Watch Time — Did they stay?",desc:"If not: the story needs work."},
+      {icon:"🖱️",label:"Clicks — Did they want more?",desc:"If not: the curiosity needs work."},
+      {icon:"💰",label:"Sales — Did they trust you?",desc:"If not: the proof or product needs work."},
+    ], key:"A winning product isn't a trophy — it's a clue. Slow down. Study it. One product, ten stories. One product, five audiences. Stop hunting. Start mining."},
+    qs:[
+      {q:"Video A: 250K views, few sales. Video B: 4,800 views, consistent sales. Which is better for business?",opts:["Video A — more people saw it","Video B — it's converting viewers into buyers","They're equal","Video A — it will eventually convert"],correct:1,fb:"Views tell you how many people walked past your store. Sales tell you how many came inside. Virality is exciting but it's not a business model. Predictability is."},
+      {q:"What is a 'Money Printer' product?",opts:["A product that immediately goes viral","A high-commission product","A product that keeps working from different angles, hooks, and audiences consistently","A trending product"],correct:2,fb:"A Money Printer isn't just a product that sells once — it's one that keeps teaching you. Different hooks, stories, and audiences all convert. That's a tree with many branches worth exploring."},
+      {q:"What should you do when you find a product that keeps converting?",opts:["Move on to find the next winning product","Slow down — test more angles, hooks, and stories from the same product","Increase your commission request","Post less to avoid saturating your audience"],correct:1,fb:"Stop treating winners like trophies. Treat them like laboratories. The pattern inside a winning product is worth more than finding ten new mediocre ones. Stay and mine it."}
+    ]
+  },
+  { num:12, name:"Creating a Repeatable System", icon:"⚙️", part:"Part IV: Build the Business",
+    info:{ eyebrow:"Chapter 12 · Systems", title:"Good Systems Protect Your Brain.", sub:"Decision fatigue is quietly killing your momentum.", visual:[
+      {icon:"😩",label:"Without Systems",desc:"Every day: what to post? Which product? Which hook? Mental budget spent before you hit record."},
+      "▼",
+      {icon:"⚙️",label:"With Systems",desc:"Products pre-selected. Hooks pre-written. Decisions made in advance. You execute — you don't decide."},
+      {icon:"🔄",label:"The Content Flywheel",desc:"Film → Post → Observe → Learn → Save → Repeat. The lesson feeds the next video."},
+    ], key:"The best system isn't the most complicated one. It's the one that makes tomorrow easier than today."},
+    qs:[
+      {q:"Why do creators procrastinate on filming even when they want to post?",opts:["They don't care enough","They're lazy","Decision fatigue — their mental budget runs out before they hit record","They don't have good products"],correct:2,fb:"Your brain has a decision budget. Every choice about what to film, which hook, which caption spends some of it. Systems pre-make those decisions so your creative energy goes toward creating."},
+      {q:"What does 'Build Once, Use Forever' mean for creators?",opts:["Make one long video instead of many short ones","Save winning hooks, story formats, and systems so they can be reused and improved","Build a website once","Film one batch of content for the whole month"],correct:1,fb:"Every good hook, story angle, and content system you develop should be saved and built on. Your library grows smarter with every post. That's compound interest for creators."},
+      {q:"What is the Content Flywheel?",opts:["A TikTok algorithm feature","Film → Post → Observe → Learn → Save → Repeat","A content scheduling tool","Going viral repeatedly"],correct:1,fb:"The flywheel doesn't stop after posting. Posting is halfway. The lesson is what feeds the next video. Without capturing lessons, every single day starts from scratch."}
+    ]
+  },
+  { num:13, name:"Mistakes That Kill Momentum", icon:"🚩", part:"Part IV: Build the Business",
+    info:{ eyebrow:"Chapter 13 · Pitfalls", title:"Most Creators Don't Fail Dramatically.", sub:"They lose momentum slowly — one quiet habit at a time.", visual:[
+      {icon:"⏰",label:"Mistake 1 — Quitting Early",desc:"20 videos isn't data. It's tuition. Most creators quit before the pattern even exists."},
+      {icon:"📋",label:"Mistake 2 — Activity ≠ Progress",desc:"Requesting samples feels productive. But finished beats planned every time."},
+      {icon:"👁️",label:"Mistake 3 — Loving Views",desc:"Views pay ego. Sales pay bills. Know which metric actually builds the business."},
+    ], key:"Most creators don't fail because they make mistakes. They fail because they stop learning from them."},
+    qs:[
+      {q:"Why is quitting after 20 videos a mistake?",opts:["TikTok punishes quitters","20 videos doesn't generate enough data to see the real patterns yet","You need 100 followers first","Your content improves magically at video 21"],correct:1,fb:"Imagine planting seeds and digging them up three days later to check if they're growing. That's quitting after 20 videos. The pattern hasn't had enough time to emerge yet."},
+      {q:"What is the difference between activity and progress?",opts:["Activity means more videos, progress means more followers","Activity can feel productive without moving the business forward — only publishing creates real evidence","They are the same thing","Progress means going viral"],correct:1,fb:"Planning grows confidence. Publishing grows your business. Both matter — but only publishing creates the evidence you need to improve. Finished beats planned every single time."},
+      {q:"What's a more useful question than 'Why are they ahead of me?'",opts:["'How long have they been doing this?'","'What principle are they using that I can learn from?'","'What products are they promoting?'","'How many followers do they have?'"],correct:1,fb:"Comparison gives you almost no useful information. Curiosity does. Asking 'what principle explains their success?' turns someone else's win into a lesson you can apply to your own business."}
+    ]
+  },
+  { num:14, name:"Your First 90 Days", icon:"📅", part:"Part IV: Build the Business",
+    info:{ eyebrow:"Chapter 14 · The Roadmap", title:"Stop Trying to Live in Month Six.", sub:"Every season has a different job.", visual:[
+      {icon:"🌱",label:"Days 1–30: Learn the Language",desc:"Goal: become comfortable, not impressive. Every post is tuition paid in lessons."},
+      "▼",
+      {icon:"🔍",label:"Days 31–60: Become an Investigator",desc:"You have evidence now. What hooks worked? What products connected? Find the patterns."},
+      "▼",
+      {icon:"⚙️",label:"Days 61–90: Build the Machine",desc:"Refine and repeat. Stop reinventing. Start improving what the data showed you works."},
+    ], key:"Your first 90 days aren't about proving you can succeed. They're about becoming the kind of creator who eventually will."},
+    qs:[
+      {q:"What is your main goal in Days 1–30?",opts:["Make your first $1,000","Get 10,000 followers","Become comfortable — not impressive — and collect early lessons","Find your winning product immediately"],correct:2,fb:"Comfort creates confidence — not the other way around. Your first month is about getting familiar, building the habit, and treating every post as paid tuition toward future success."},
+      {q:"What should you focus on in Days 31–60?",opts:["Posting more frequently","Studying the evidence from your first month and finding patterns","Completely changing your niche","Investing in better equipment"],correct:1,fb:"By day 31 you have something incredibly valuable: evidence. Patterns start whispering before they shout. This is the month you learn to listen to what the data is quietly telling you."},
+      {q:"If you haven't made sales after 90 days, what might still be growing?",opts:["Nothing — start over","Your follower count automatically","Your skills, confidence, storytelling, and pattern recognition — all of which compound over time","Your equipment quality"],correct:2,fb:"Visible results sometimes arrive after months of invisible growth. Don't ignore the roots just because you can't see the fruit yet. Skills and pattern recognition compound even when commissions don't."}
+    ]
+  },
+  { num:15, name:"The Long Game", icon:"🌳", part:"Part V: Play the Long Game",
+    info:{ eyebrow:"Chapter 15 · Endurance", title:"The People Who Stay Usually Win.", sub:"Time turns ordinary effort into extraordinary results.", visual:[
+      {icon:"🌱",label:"Year 1",desc:"Roots growing underground. Nothing impressive to show. This is where most people quit."},
+      "▼",
+      {icon:"🌿",label:"Year 2",desc:"Patterns emerging. Hooks getting sharper. Products getting smarter. Still invisible to outsiders."},
+      "▼",
+      {icon:"🌳",label:"Year 3+",desc:"The compound effect becomes undeniable. People call it overnight success. You know what it took."},
+    ], key:"Success doesn't belong to the creator who starts fastest. It belongs to the one who stays long enough for their lessons to compound."},
+    qs:[
+      {q:"What does 'compound interest for creators' look like?",opts:["Making more money each month","Skills, patterns, and systems becoming more valuable and easier to use over time","Getting more followers automatically","Videos performing better with age"],correct:1,fb:"One hook teaches a lesson. A hundred hooks teach instinct. One product teaches curiosity. A hundred products teach judgment. Skills compound invisibly — then suddenly they're everywhere in your work."},
+      {q:"What should you NOT do during a slow month?",opts:["Keep posting consistently","Study what's working in your niche","Make permanent decisions based on temporary weather","Review your analytics honestly"],correct:2,fb:"Don't make permanent decisions — quitting, pivoting, starting over entirely — based on a temporary slow period. Businesses have seasons. Creators do too. Winter doesn't mean the tree died."},
+      {q:"What's the most important question to ask before quitting?",opts:["Am I good enough for this?","What if the lesson I'm looking for is hiding inside the next fifty videos, not the last fifty?","Should I try a different niche?","Is TikTok Shop still growing?"],correct:1,fb:"You don't know what's in the next fifty videos. Neither does anyone. But the only creators guaranteed never to find out are the ones who stop posting before they get there."}
+    ]
+  },
+  { num:16, name:"The Money Glitch Manifesto", icon:"🦅", part:"Part V: Play the Long Game",
+    info:{ eyebrow:"Chapter 16 · The Real Payoff", title:"It Was Never About TikTok Shop.", sub:"You've been building something that doesn't expire.", visual:[
+      {icon:"👁️",label:"Chapter 1 — Attention",desc:"You learned to see what earns attention — the doorway every opportunity walks through."},
+      "▼",
+      {icon:"📈",label:"Chapter 5 — Progress",desc:"You learned WHY people pay attention — they're buying a better version of their day."},
+      "▼",
+      {icon:"🌍",label:"Chapter 16 — See Everything",desc:"You learned the real skill: noticing what others walk past. On any platform. In any business. Forever."},
+    ], key:"The greatest opportunities are rarely hidden. They're usually just hiding in plain sight. And now you know how to see them. 🦅"},
+    qs:[
+      {q:"What is the 'real money glitch'?",opts:["A secret algorithm exploit","Going viral consistently","A set of skills you earned the slow way that work on any platform, in any business, forever","Getting to 100k followers"],correct:2,fb:"Not a loophole. Not a trend. A set of transferable abilities — attention, communication, trust, pattern recognition — that belong to you now and no algorithm update can ever take back."},
+      {q:"What did the bald eagle magnet actually teach Olivia?",opts:["That random products can go viral","That the Super Bowl is great for sales","That the opportunity was never in the product — it was in learning how to notice opportunity itself","That simple content performs best"],correct:2,fb:"The eagle didn't change her life. Her response to it did — she noticed something, acted before she felt ready, and stayed curious enough to understand why it worked. That's the real lesson."},
+      {q:"What three skills does The Money Glitch say you've actually built?",opts:["Followers, products, and income","A TikTok account, a Gumroad store, and a website","The ability to earn attention, understand people, and notice opportunities others walk right past","Skills for TikTok, Instagram, and YouTube"],correct:2,fb:"Earn attention (Ch.1). Understand why people buy (Ch.5). Notice opportunities others walk past (Ch.16). That's not a TikTok skill. That's a life skill. And you earned it the right way."}
+    ]
+  }
+];
+
+// ── STATE ──────────────────────────────────────
+function getP() { try { return JSON.parse(localStorage.getItem('tmg_v1')||'{}'); } catch { return {}; } }
+function setP(d) { try { localStorage.setItem('tmg_v1',JSON.stringify(d)); } catch {} }
+function isDone(n) { return getP()[`c${n}`]===true; }
+function markDone(n) { const p=getP(); p[`c${n}`]=true; setP(p); }
+function unlocked(n) { return n===1 || isDone(n-1); }
+function doneCount() { return LEVELS.filter(l=>isDone(l.num)).length; }
+
+function resetAll() {
+  if(confirm('Reset all progress? This cannot be undone.')) {
+    try{localStorage.removeItem('tmg_v1');}catch{}
+    buildIntroDots();
+    showMap();
+  }
+}
+
+// ── SCREENS ──────────────────────────────────────
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── INTRO ──────────────────────────────────────
+function buildIntroDots() {
+  const c = document.getElementById('intro-dots');
+  if(!c) return;
+  c.innerHTML = LEVELS.map(l=>{
+    const cls = isDone(l.num)?'done':(unlocked(l.num)?'next':'');
+    return `<div class="dot ${cls}">${l.num}</div>`;
+  }).join('');
+}
+
+// ── MAP ──────────────────────────────────────
+function showMap() {
+  buildIntroDots();
+  renderMap();
+  go('map-screen');
+}
+
+function renderMap() {
+  const done = doneCount();
+  const pct = (done/16)*100;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-eagle').style.left = Math.min(pct,94)+'%';
+  document.getElementById('prog-count').textContent = `${done}/16`;
+
+  let html = '';
+  PARTS.forEach((pt,pi)=>{
+    html += `<div class="map-part">
+      <div class="part-label ${pt.cls}">${pt.label}</div>
+      <div class="part-grid">`;
+    pt.levels.forEach(ln=>{
+      const lv = LEVELS.find(l=>l.num===ln);
+      const done2 = isDone(ln);
+      const avail = unlocked(ln);
+      const isNext = avail && !done2;
+      const pcls = `p${pi+1}`;
+      let cls = 'level-card ';
+      if(done2) cls+='done';
+      else if(avail) cls+=`available ${pcls}${isNext?' next-up':''}`;
+      else cls+='locked';
+      const click = (avail||done2)?`onclick="openLevel(${ln})"`:'' ;
+      const badge = done2?`<span class="card-badge badge-done">★ Done</span>`:
+                    avail?`<span class="card-badge badge-available">Play →</span>`:
+                    `<span class="card-badge badge-locked">🔒 Locked</span>`;
+      html += `<div class="${cls}" ${click}>
+        <div class="card-num">Level ${ln}</div>
+        <div class="card-icon">${lv.icon}</div>
+        <div class="card-name">${lv.name}</div>
+        ${badge}
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  document.getElementById('map-body').innerHTML = html;
+}
+
+// ── LESSON ──────────────────────────────────────
+let cur = null, qIdx = 0;
+
+function openLevel(n) {
+  cur = LEVELS.find(l=>l.num===n);
+  qIdx = 0;
+  document.getElementById('lhd-title').textContent = `Level ${n}: ${cur.name}`;
+  document.getElementById('lhd-part').textContent = cur.part;
+  renderLesson();
+  go('lesson-screen');
+}
+
+function renderLesson() {
+  const L = cur;
+  const I = L.info;
+  const visHtml = I.visual.map(v=>{
+    if(v==='▼') return `<div class="v-arrow">▼</div>`;
+    return `<div class="v-row">
+      <div class="v-icon">${v.icon}</div>
+      <div class="v-text">
+        <div class="v-label">${v.label}</div>
+        <div class="v-desc">${v.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const Q = L.qs[qIdx];
+  const letters = ['A','B','C','D'];
+  const optsHtml = Q.opts.map((o,i)=>
+    `<button class="opt-btn" onclick="answer(${i})" id="o${i}">
+      <div class="opt-letter">${letters[i]}</div>${o}
+    </button>`
+  ).join('');
+
+  document.getElementById('lesson-body').innerHTML = `
+    <div class="info-card">
+      <div class="info-eyebrow">${I.eyebrow}</div>
+      <div class="info-title">${I.title}</div>
+      ${I.sub?`<div class="info-sub">${I.sub}</div>`:''}
+      <div class="visual-area">${visHtml}</div>
+      <div class="key-box">
+        <div class="key-label">🦅 The Key Idea</div>
+        <div class="key-text">${I.key}</div>
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-top">
+        <div class="quiz-badge">Quick Quiz</div>
+        <div class="quiz-count" id="qcount">Question ${qIdx+1} of ${L.qs.length}</div>
+      </div>
+      <div class="quiz-q" id="qq">${Q.q}</div>
+      <div class="options" id="qopts">${optsHtml}</div>
+      <div class="feedback-box" id="fb"></div>
+      <button class="next-btn" id="nxt" onclick="nextQ()">
+        ${qIdx<L.qs.length-1?'Next Question →':'Complete Level 🦅'}
+      </button>
+    </div>
+
+    <div class="win-card" id="win-card">
+      <div class="win-eagle">🦅</div>
+      <div class="win-title">Level ${L.num} Complete!</div>
+      <div class="win-sub">
+        ${L.num<16
+          ? `<strong>Level ${L.num+1}: ${LEVELS[L.num].name}</strong> is now unlocked. Keep going!`
+          : "You've completed all 16 levels of The Money Glitch! 🎉"}
+      </div>
+      ${L.num<16
+        ? `<button class="win-next-btn" onclick="openLevel(${L.num+1})">Start Level ${L.num+1} →</button><br>`
+        : `<button class="win-next-btn" onclick="go('complete-screen')">See Your Completion 🦅</button><br>`}
+      <button class="win-map-btn" onclick="showMap()">Back to Map</button>
+    </div>
+  `;
+}
+
+function answer(sel) {
+  const Q = cur.qs[qIdx];
+  const correct = Q.correct;
+  document.querySelectorAll('.opt-btn').forEach(b=>{ b.classList.add('disabled'); b.onclick=null; });
+  document.getElementById(`o${sel}`).classList.add(sel===correct?'correct':'wrong');
+  if(sel!==correct) document.getElementById(`o${correct}`).classList.add('correct');
+  document.getElementById(`o${sel}`).querySelector('.opt-letter').textContent = sel===correct?'✓':'✗';
+  if(sel!==correct) document.getElementById(`o${correct}`).querySelector('.opt-letter').textContent='✓';
+  const fb = document.getElementById('fb');
+  fb.textContent = (sel===correct?'✓ ':'✗ ')+Q.fb;
+  fb.className = `feedback-box show ${sel===correct?'correct':'wrong'}`;
+  const nxt = document.getElementById('nxt');
+  nxt.className = 'next-btn show';
+}
+
+function nextQ() {
+  qIdx++;
+  const L = cur;
+  if(qIdx>=L.qs.length) {
+    markDone(L.num);
+    document.getElementById('win-card').classList.add('show');
+    document.getElementById('nxt').style.display='none';
+    document.querySelector('.quiz-card').style.display='none';
+    if(L.num<16) showUnlock(L.num+1);
+    return;
+  }
+  const Q = L.qs[qIdx];
+  const letters = ['A','B','C','D'];
+  document.getElementById('qcount').textContent=`Question ${qIdx+1} of ${L.qs.length}`;
+  document.getElementById('qq').textContent=Q.q;
+  document.getElementById('qopts').innerHTML = Q.opts.map((o,i)=>
+    `<button class="opt-btn" onclick="answer(${i})" id="o${i}">
+      <div class="opt-letter">${letters[i]}</div>${o}
+    </button>`
+  ).join('');
+  document.getElementById('fb').className='feedback-box';
+  document.getElementById('fb').textContent='';
+  const nxt=document.getElementById('nxt');
+  nxt.className='next-btn';
+  nxt.textContent = qIdx<L.qs.length-1?'Next Question →':'Complete Level 🦅';
+}
+
+// ── UNLOCK OVERLAY ──────────────────────────────────────
+function showUnlock(nextNum) {
+  const ov = document.getElementById('unlock-overlay');
+  const lv = LEVELS.find(l=>l.num===nextNum);
+  document.getElementById('unlock-sub-text').textContent =
+    lv ? `Level ${nextNum}: ${lv.name}` : '';
+  const cc = document.getElementById('confetti');
+  cc.innerHTML='';
+  const cols=['#F5C842','#F07050','#5A9E6E','#5AACE0','#9B7FD4','#F0EBE0','#D4A520'];
+  for(let i=0;i<50;i++){
+    const p=document.createElement('div');
+    p.className='cpce';
+    const size=6+Math.random()*8;
+    p.style.cssText=`left:${Math.random()*100}%;top:-20px;width:${size}px;height:${size}px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>0.5?'50%':'3px'};animation-delay:${Math.random()*0.4}s;animation-duration:${1.2+Math.random()*0.8}s;`;
+    cc.appendChild(p);
+  }
+  ov.classList.add('show');
+  setTimeout(()=>ov.classList.remove('show'),2600);
+}
+
+// ── INIT ──────────────────────────────────────
+buildIntroDots();
+</script>
+</body>
+</html>
