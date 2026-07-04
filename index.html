@@ -231,7 +231,7 @@ body {
 
 /* ── Illustrated adventure map ── */
 .map-scene-wrap {
-  background: linear-gradient(180deg, #DCEFFB 0%, #EAF7EE 35%, #FFF7E0 70%, #FFEAD8 100%);
+  background: linear-gradient(180deg, #AEE0F7 0%, #CFEBFA 10%, #DFF3E2 22%, #CBEAD1 55%, #B9E2C2 100%);
   padding: 24px 16px 60px;
 }
 
@@ -241,17 +241,32 @@ body {
   margin: 0 auto;
   border-radius: 28px;
   overflow: hidden;
-  background: linear-gradient(180deg, #EAF6FF 0%, #F3FBF1 100%);
+  background: linear-gradient(180deg, #BFE6F8 0%, #DCF3E4 14%, #D3EED8 45%, #C4E7CB 100%);
   border: 3px solid var(--dark);
   box-shadow: 6px 6px 0 var(--dark);
 }
 
-.map-biome { position:absolute; left:0; right:0; z-index:0; pointer-events:none; }
-.biome-p1 { background: linear-gradient(180deg, rgba(245,200,66,0.4), rgba(245,200,66,0.05)); }
-.biome-p2 { background: linear-gradient(180deg, rgba(90,158,110,0.4), rgba(90,158,110,0.05)); }
-.biome-p3 { background: linear-gradient(180deg, rgba(90,172,224,0.4), rgba(90,172,224,0.05)); }
-.biome-p4 { background: linear-gradient(180deg, rgba(155,127,212,0.4), rgba(155,127,212,0.05)); }
-.biome-p5 { background: linear-gradient(180deg, rgba(240,112,80,0.4), rgba(240,112,80,0.05)); }
+.map-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: repeat-y;
+  background-size: 100% 640px;
+  background-image:
+    radial-gradient(ellipse 46% 30% at 6% 22%, rgba(74,150,98,0.35), transparent 65%),
+    radial-gradient(ellipse 50% 32% at 96% 48%, rgba(90,168,112,0.32), transparent 65%),
+    radial-gradient(ellipse 42% 28% at 12% 78%, rgba(106,178,124,0.3), transparent 65%),
+    radial-gradient(ellipse 48% 30% at 90% 8%, rgba(74,150,98,0.28), transparent 65%);
+}
+
+.map-biome { position:absolute; left:0; right:0; z-index:1; pointer-events:none; }
+.biome-p1 { background: linear-gradient(180deg, rgba(245,200,66,0.18), rgba(245,200,66,0.02)); }
+.biome-p2 { background: linear-gradient(180deg, rgba(74,150,98,0.22), rgba(74,150,98,0.02)); }
+.biome-p3 { background: linear-gradient(180deg, rgba(90,172,224,0.2), rgba(90,172,224,0.02)); }
+.biome-p4 { background: linear-gradient(180deg, rgba(155,127,212,0.16), rgba(155,127,212,0.02)); }
+.biome-p5 { background: linear-gradient(180deg, rgba(240,112,80,0.16), rgba(240,112,80,0.02)); }
 
 .map-decor {
   position: absolute;
@@ -1294,13 +1309,15 @@ const NODE_SPACING_Y = 200;
 const MAP_TOP_PAD = 110;
 const MAP_BOTTOM_PAD = 90;
 const MAP_DECOR = [
-  {e:'☁️',x:14,y:0.015,cls:'map-cloud'}, {e:'☁️',x:80,y:0.05,cls:'map-cloud'},
-  {e:'🌳',x:88,y:0.10}, {e:'🌿',x:8,y:0.15}, {e:'🌸',x:90,y:0.20},
-  {e:'☁️',x:20,y:0.23,cls:'map-cloud'}, {e:'🌲',x:10,y:0.29}, {e:'🍃',x:92,y:0.33},
-  {e:'🌊',x:88,y:0.40}, {e:'🐚',x:10,y:0.44}, {e:'☁️',x:75,y:0.47,cls:'map-cloud'},
-  {e:'🌸',x:12,y:0.52}, {e:'🏔️',x:90,y:0.58}, {e:'🌲',x:8,y:0.63},
-  {e:'☁️',x:22,y:0.67,cls:'map-cloud'}, {e:'🌅',x:88,y:0.75}, {e:'🌴',x:10,y:0.80},
-  {e:'✨',x:90,y:0.86}, {e:'🏁',x:50,y:0.965}
+  {e:'☁️',x:14,y:0.015,cls:'map-cloud'}, {e:'☁️',x:80,y:0.04,cls:'map-cloud'},
+  {e:'🌳',x:88,y:0.09}, {e:'🌿',x:8,y:0.13}, {e:'🌼',x:90,y:0.18},
+  {e:'☁️',x:22,y:0.21,cls:'map-cloud'}, {e:'🌲',x:10,y:0.26}, {e:'🦋',x:92,y:0.30},
+  {e:'☁️',x:70,y:0.34,cls:'map-cloud'}, {e:'🐑',x:88,y:0.38}, {e:'🍀',x:10,y:0.42},
+  {e:'☁️',x:16,y:0.46,cls:'map-cloud'}, {e:'🌻',x:90,y:0.50}, {e:'🌲',x:8,y:0.54},
+  {e:'🐇',x:92,y:0.58}, {e:'☁️',x:76,y:0.61,cls:'map-cloud'}, {e:'🌳',x:8,y:0.65},
+  {e:'🌼',x:88,y:0.69}, {e:'☁️',x:20,y:0.72,cls:'map-cloud'}, {e:'🦋',x:10,y:0.76},
+  {e:'🌲',x:90,y:0.80}, {e:'🐑',x:8,y:0.84}, {e:'☁️',x:78,y:0.87,cls:'map-cloud'},
+  {e:'🌿',x:90,y:0.91}, {e:'🍀',x:10,y:0.94}, {e:'🏁',x:50,y:0.965}
 ];
 
 let pendingFlight = null;
